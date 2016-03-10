@@ -10,18 +10,25 @@
     <meta charset="utf-8">
     
     <script src="jquery.min.js"></script>
+    <script src="heap.js"></script>
+	<script src="leaflet-src.js"></script>
+	<script src="leaflet-indoor.js"></script>
+	<script src="leaflet.markercluster.js"></script>
     <script src="http://contentsrv.ibecom.ru/tracker/socket.io/socket.io.js"></script>
     
     <script type="text/javascript">
        
 		var appID = 3;
-		window.appSideInit = true;
 		
+		// should be before loading ibgeomap.js because ibgeomap.js checks this flag immediatly
+		window.appSideInit = true;
+				
 		var socket = io.connect('http://contentsrv.ibecom.ru', {
 			path : "/tracker/socket.io"
 		});
 		
 		$(function() {
+						
 			$.getJSON('map_canvas.json',
 					function(mapdata) {
 						initMap({
@@ -37,16 +44,15 @@
 		});
 		
 	</script>
+	<script src="ibgeomap.js"></script>
     
 </head>
 <body>
 
+	
+
+
 	<div id="map">
-		<script src="heap.js"></script>
-		<script src="leaflet-src.js"></script>
-		<script src="leaflet-indoor.js"></script>
-		<script src="leaflet.markercluster.js"></script>
-		<script src="ibgeomap.js"></script>
 	</div>
 
 
