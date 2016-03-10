@@ -15,6 +15,7 @@
 	<script src="leaflet-indoor.js"></script>
 	<script src="leaflet.markercluster.js"></script>
     <script src="http://contentsrv.ibecom.ru/tracker/socket.io/socket.io.js"></script>
+    <script src="TrackPlayer.js"></script>
     
     <script type="text/javascript">
        
@@ -52,13 +53,13 @@
 			height: 100%;
 		}
 		
-		.left_container {
+		.left_panel {
 			width: 400px;
 			height: 100%;
 			float: left;
 		}
 		
-		.rigth_container {
+		.rigth_panel {
 			height: 100%;
 			overflow: hidden;
 		}
@@ -68,8 +69,8 @@
 <body>
 
 	<div class="main_container">
-		<div class="left_container"></div>
-		<div id="map" class="right_container"></div>
+		<div class="left_panel"></div>
+		<div id="map" class="right_panel"></div>
 	</div>
 
 </body>
