@@ -9,17 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta charset="utf-8">
     
-</head>
-<body>
-<div id="map">
-
-	<script src="jquery.min.js"></script>
-    <script src="heap.js"></script>
-    <script src="leaflet-src.js"></script>
-    <script src="leaflet-indoor.js"></script>
-    <script src="leaflet.markercluster.js"></script>
+    <script src="jquery.min.js"></script>
     <script src="http://contentsrv.ibecom.ru/tracker/socket.io/socket.io.js"></script>
-    <script src="ibgeomap.js"></script>
+    
     <script type="text/javascript">
        
 		var appID = 3;
@@ -43,8 +35,20 @@
 						loadMapCanvas(mapdata);
 					});
 		});
-		</script>
+		
+	</script>
+    
+</head>
+<body>
 
-</div>
+	<div id="map">
+		<script src="heap.js"></script>
+		<script src="leaflet-src.js"></script>
+		<script src="leaflet-indoor.js"></script>
+		<script src="leaflet.markercluster.js"></script>
+		<script src="ibgeomap.js"></script>
+	</div>
+
+
 </body>
 </html>
