@@ -17,7 +17,7 @@
 	<script src="leaflet.markercluster.js"></script>
     <script src="http://contentsrv.ibecom.ru/tracker/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>   
-    <script src="Map.js"></script> 
+    <script src="TrackMap.js"></script> 
     <script src="TrackPlayer.js"></script>
     
     <script type="text/javascript">
@@ -30,7 +30,7 @@
 		var socket = io.connect('http://contentsrv.ibecom.ru', {
 				path : "/tracker/socket.io"
 			}),
-			map = new Map(),
+			map = new TrackMap(),
 			trackPlayer = new TrackPlayer(map);
 				
 		$(function() {

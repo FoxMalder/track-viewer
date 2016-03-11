@@ -10,7 +10,7 @@ describe("TrackPlayer", function() {
 		timerCallback = jasmine.createSpy("timerCallback");
 		jasmine.clock().install();
 
-		map = new Map();
+		map = new TrackMap();
 
 		trackPlayer = new TrackPlayer(map);
 

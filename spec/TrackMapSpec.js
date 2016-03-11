@@ -1,10 +1,10 @@
-describe("Map", function() {
+describe("TrackMap", function() {
 	
 	var map;
 
 	beforeEach(function() {
 						
-		map = new Map();		
+		map = new TrackMap();		
 		
 		// defined by ibgeomap.js that is not included into SpecRunner for simplicity
 		window.onTerminalPositionChange = function() {
