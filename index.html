@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="leaflet.css"/>
     <link rel="stylesheet" href="custom.css"/>
     <link rel="stylesheet" href="MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta charset="utf-8">
     
@@ -15,6 +16,8 @@
 	<script src="leaflet-indoor.js"></script>
 	<script src="leaflet.markercluster.js"></script>
     <script src="http://contentsrv.ibecom.ru/tracker/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>   
+    <script src="Map.js"></script> 
     <script src="TrackPlayer.js"></script>
     
     <script type="text/javascript">
@@ -25,10 +28,20 @@
 		window.appSideInit = true;
 				
 		var socket = io.connect('http://contentsrv.ibecom.ru', {
-			path : "/tracker/socket.io"
-		});
-		
+				path : "/tracker/socket.io"
+			}),
+			map = new Map(),
+			trackPlayer = new TrackPlayer(map);
+				
 		$(function() {
+			
+			socket.on('load-track', function (track) {
+		        if (track.length === 0) {
+		            return;
+		        }
+		        trackPlayer.load(track);
+		        trackPlayer.play();
+		    });
 						
 			$.getJSON('map_canvas.json',
 					function(mapdata) {
@@ -41,7 +54,23 @@
 							fitBounds : true
 						});
 						loadMapCanvas(mapdata);
-					});
+					});	
+			
+			$('#play_button').button({
+		        icons: {
+		          primary: "ui-icon-play"
+		        },
+		        text: false
+		    }).click(function() {
+		    	
+		    	socket.emit('load-track', {
+		            appId: 3,
+		            startTimeStamp: Date.parse("29 Dec 2015 17:32 UTC+3"),
+		            endTimeStamp: Date.parse("29 Dec 2015 17:52 UTC+3")
+		        });
+		    	
+		    });
+			
 		});
 		
 	</script>
@@ -63,13 +92,16 @@
 			height: 100%;
 			overflow: hidden;
 		}
+				
 	</style>
     
 </head>
 <body>
 
 	<div class="main_container">
-		<div class="left_panel"></div>
+		<div class="left_panel">
+			<button id="play_button">Воспроизведение</button>
+		</div>
 		<div id="map" class="right_panel"></div>
 	</div>
 
