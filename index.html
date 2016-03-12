@@ -20,6 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/locale/ru.js"></script>  
     <script src="TrackMap.js"></script> 
+    <script src="Track.js"></script>
     <script src="TrackPlayer.js"></script>
     
     <script type="text/javascript">
@@ -37,11 +38,13 @@
 			map = new TrackMap(),
 			trackPlayer = new TrackPlayer({
 				map : map,
-				onLoad : function() {
+				onLoad : function(track) {
+					
+					console.log(track);
 															
 					$("#time_slider").slider("option", {
-						min : trackPlayer.getStartTime(),
-						max : trackPlayer.getEndTime(),
+						min : track.getStartTime(),
+						max : track.getEndTime(),
 						disabled: false 
 					});
 				},
@@ -55,16 +58,16 @@
 				
 		$(function() {
 			
-			socket.on('load-track', function (track) {
-		        if (track.length === 0) {
+			socket.on('load-track', function (points) {
+		        if (points.length === 0) {
 		            return;
 		        }
 		        
-		        $.each(track, function(i, point) {
+		        $.each(points, function(i, point) {
 		        	point.timestamp = parseInt(point.timestamp, 10);
 		        });
 		        
-		        trackPlayer.load(track);
+		        trackPlayer.load(new Track(points));
 		        trackPlayer.play();
 		    });
 						

@@ -49,7 +49,7 @@ describe("TrackPlayer", function() {
 			timestamp : 300
 		} ];
 				
-		trackPlayer.load(points);
+		trackPlayer.load(new Track(points));
 		trackPlayer.play();
 		
 		jasmine.clock().tick(1000);
@@ -80,7 +80,7 @@ describe("TrackPlayer", function() {
 			timestamp : 300
 		}];
 				
-		trackPlayer.load(points);
+		trackPlayer.load(new Track(points));
 		trackPlayer.play();
 				
 		expect(map.displayPoint).toHaveBeenCalledTimes(1);
@@ -116,7 +116,7 @@ describe("TrackPlayer", function() {
 			timestamp : 200
 		}];
 				
-		trackPlayer.load(points);
+		trackPlayer.load(new Track(points));
 		trackPlayer.play();
 		
 		jasmine.clock().tick(99);
@@ -144,7 +144,7 @@ describe("TrackPlayer", function() {
 			timestamp : 200
 		}];
 				
-		trackPlayer.load(points);
+		trackPlayer.load(new Track(points));
 		trackPlayer.play();
 		
 		jasmine.clock().tick(50); // 50 ms left
@@ -175,7 +175,7 @@ describe("TrackPlayer", function() {
 			timestamp : 600
 		}];
 		
-		trackPlayer.load(points);
+		trackPlayer.load(new Track(points));
 		trackPlayer.play();
 				
 		jasmine.clock().tick(100);

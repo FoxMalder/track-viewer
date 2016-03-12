@@ -3,7 +3,7 @@ function TrackPlayer(options) {
 	this._onLoad = options.onLoad;
 	this._onTimeChange = options.onTimeChange;
 	
-	this._points = null;
+	this._track = null;
 	this._speed = 1.0;
 	this._currentTime = null;
 	this._displayPointStart = null;
@@ -13,15 +13,16 @@ function TrackPlayer(options) {
 
 TrackPlayer.UPDATE_CURRENT_TIME_INTERVAL = 100; // ms
 
-TrackPlayer.prototype.load = function(points) {
-	this._points = points;
+TrackPlayer.prototype.load = function(track) {
+	this._track = track;
+	this._points = track.points;
 	
 	if (typeof this._onLoad === "function") {
-		this._onLoad();
+		this._onLoad(track);
 	}
 };
 
-TrackPlayer.prototype.play = function(points) {
+TrackPlayer.prototype.play = function() {
 	
 	var self = this;
 	
@@ -51,27 +52,12 @@ TrackPlayer.prototype.setSpeed = function(speed) {
 
 TrackPlayer.prototype.setCurrentTime = function(time) {
 	
-	this._pointIndex = this._findPointIndex(time);
+	this._pointIndex = this._track.findPointIndex(time);
 	
 	var displayTime = this._points[this._pointIndex].timestamp - time;
 	
 	this._processPoint(displayTime);
 	this._resetDisplayNextPointTask(displayTime);
-};
-
-TrackPlayer.prototype._findPointIndex = function(time) {
-	
-	if (this._points.lenght === 1) {
-		return 0;
-	}
-	
-	if (time === this.getEndTime()) {
-		return this._points.length - 1;
-	}
-	
-	return this._points.findIndex(function(point) {
-		return point.timestamp > time;
-	}) - 1;
 };
 
 TrackPlayer.prototype._getDisplayTime = function() {
@@ -116,7 +102,7 @@ TrackPlayer.prototype._processPoint = function(displayTime) {
 	var point = this._points[this._pointIndex];
 	
 	this._map.displayPoint(point);
-	this._displayPointStart = Date.now();
+	this._displayPointStart = Date.now() - displayTime;
 	
 	this._updateCurrentTime(point.timestamp + displayTime);
 };
@@ -129,28 +115,5 @@ TrackPlayer.prototype._updateCurrentTime = function(currentTime) {
 		this._onTimeChange(this._currentTime);
 	}	
 };
-
-TrackPlayer.prototype.getStartTime = function() {
-	
-	var startTime;
-	
-	if (this._points && this._points.length > 0) {
-		startTime = this._points[0].timestamp;
-	}
-	
-	return startTime;
-};
-
-TrackPlayer.prototype.getEndTime = function() {
-	
-	var endTime;
-	
-	if (this._points && this._points.length > 0) {		
-		endTime = this._points[this._points.length - 1].timestamp;
-	}
-	
-	return endTime;
-};
-
 
 
