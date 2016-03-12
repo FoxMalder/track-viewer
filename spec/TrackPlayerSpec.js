@@ -127,6 +127,8 @@ describe("TrackPlayer", function() {
 	});
 	
 	it("should react to change speed by adjust time of displaying current point", function() {
+		
+		jasmine.clock().mockDate();
 
 		var points = [ {
 			x : 10,
@@ -151,12 +153,14 @@ describe("TrackPlayer", function() {
 		expect(map.displayPoint).toHaveBeenCalledTimes(1);
 		
 		jasmine.clock().tick(1);
-		expect(map.displayPoint).toHaveBeenCalledTimes(1);
+		expect(map.displayPoint).toHaveBeenCalledTimes(2);
 		
 	});
 	
-	it("should call 'onTimeChange' handler each time when point is displayed", function() {
+	it("should call 'onTimeChange' handler each TrackPlayer.UPDATE_CURRENT_TIME_INTERVAL ms while playing", function() {
 		
+		jasmine.clock().mockDate();
+				
 		var points = [ {
 			x : 10,
 			y : 20,
@@ -166,20 +170,20 @@ describe("TrackPlayer", function() {
 			x : 30,
 			y : 40,
 			level : "1",
-			timestamp : 300
+			timestamp : 600
 		}];
 		
 		trackPlayer.load(points);
 		trackPlayer.play();
+				
+		jasmine.clock().tick(100);
+		expect(onTimeChangeSpy).toHaveBeenCalledWith(200);
 		
-		expect(onTimeChangeSpy).toHaveBeenCalledTimes(1);
-		expect(onTimeChangeSpy).toHaveBeenCalledWith(100);
-		
-		
-		jasmine.clock().tick(200);
-		expect(onTimeChangeSpy).toHaveBeenCalledTimes(2);
+		jasmine.clock().tick(100);
 		expect(onTimeChangeSpy).toHaveBeenCalledWith(300);
 		
+		jasmine.clock().tick(100);
+		expect(onTimeChangeSpy).toHaveBeenCalledWith(400);
+					
 	});
-	
 });
