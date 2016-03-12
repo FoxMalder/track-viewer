@@ -30,7 +30,7 @@ TrackPlayer.prototype.play = function(points) {
 	}
 	
 	this._pointIndex = 0;	
-	this._processPoint();
+	this._processPoint(0);
 	
 	this._setupDisplayNextPoint();
 	
@@ -44,19 +44,46 @@ TrackPlayer.prototype.play = function(points) {
 
 TrackPlayer.prototype.setSpeed = function(speed) {
 	
-	var displayingTime = this._getDisplayTime();
+	var displayTime = this._getDisplayTime();
 	this._speed = speed;
-		
-	// reset displaying next point task
-	if (this._displayNextPointTask) {
-		
-		clearTimeout(this._displayNextPointTask);
-		this._setupDisplayNextPoint(displayingTime);
+	this._resetDisplayNextPointTask(displayTime);		
+};
+
+TrackPlayer.prototype.setCurrentTime = function(time) {
+	
+	this._pointIndex = this._findPointIndex(time);
+	
+	var displayTime = this._points[this._pointIndex].timestamp - time;
+	
+	this._processPoint(displayTime);
+	this._resetDisplayNextPointTask(displayTime);
+};
+
+TrackPlayer.prototype._findPointIndex = function(time) {
+	
+	if (this._points.lenght === 1) {
+		return 0;
 	}
+	
+	if (time === this.getEndTime()) {
+		return this._points.length - 1;
+	}
+	
+	return this._points.findIndex(function(point) {
+		return point.timestamp > time;
+	}) - 1;
 };
 
 TrackPlayer.prototype._getDisplayTime = function() {
 	return (Date.now() - this._displayPointStart) * this._speed;
+};
+
+TrackPlayer.prototype._resetDisplayNextPointTask = function(displayTime) {
+	if (this._displayNextPointTask) {
+		
+		clearTimeout(this._displayNextPointTask);
+		this._setupDisplayNextPoint(displayTime);
+	}
 };
 
 TrackPlayer.prototype._setupDisplayNextPoint = function(displayTime) {
@@ -77,22 +104,23 @@ TrackPlayer.prototype._setupDisplayNextPoint = function(displayTime) {
 	this._displayNextPointTask = setTimeout(function() {
 		
 		self._pointIndex++;
-		self._processPoint();
+		self._processPoint(displayTime);
 		self._setupDisplayNextPoint();
 		
 	}, delay);
 	
 };
 
-TrackPlayer.prototype._processPoint = function() {
+TrackPlayer.prototype._processPoint = function(displayTime) {
 	
 	var point = this._points[this._pointIndex];
 	
 	this._map.displayPoint(point);
 	this._displayPointStart = Date.now();
 	
-	this._updateCurrentTime(point.timestamp);
+	this._updateCurrentTime(point.timestamp + displayTime);
 };
+
 
 TrackPlayer.prototype._updateCurrentTime = function(currentTime) {
 	this._currentTime = currentTime;

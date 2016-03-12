@@ -119,6 +119,8 @@
 				min : 0,
 				max : 1,
 				slide : function(event, ui) {
+					var time = ui.value;
+					trackPlayer.setCurrentTime(time);
 				},
 				disabled : true
 			});
