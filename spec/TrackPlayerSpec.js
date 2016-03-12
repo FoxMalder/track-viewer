@@ -10,11 +10,13 @@ describe("TrackPlayer", function() {
 		jasmine.clock().install();
 		
 		onTimeChangeSpy = jasmine.createSpy("onTimeChangedSpy");
+		onLoadSpy = jasmine.createSpy("onLoadSpy");
 
 		map = new TrackMap();
 
 		trackPlayer = new TrackPlayer({
 			map : map,
+			onLoad : onLoadSpy,
 			onTimeChange : onTimeChangeSpy
 		});
 		
@@ -186,4 +188,11 @@ describe("TrackPlayer", function() {
 		expect(onTimeChangeSpy).toHaveBeenCalledWith(400);
 					
 	});
+	
+	it("should call 'onLoad' handler when 'load()' method is called", function() {
+		
+		trackPlayer.load([]);
+		expect(onLoadSpy).toHaveBeenCalled();
+		
+	});	
 });

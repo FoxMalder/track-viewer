@@ -1,5 +1,6 @@
 function TrackPlayer(options) {
 	this._map = options.map;
+	this._onLoad = options.onLoad;
 	this._onTimeChange = options.onTimeChange;
 	
 	this._points = null;
@@ -14,6 +15,10 @@ TrackPlayer.UPDATE_CURRENT_TIME_INTERVAL = 100; // ms
 
 TrackPlayer.prototype.load = function(points) {
 	this._points = points;
+	
+	if (typeof this._onLoad === "function") {
+		this._onLoad();
+	}
 };
 
 TrackPlayer.prototype.play = function(points) {
@@ -95,6 +100,29 @@ TrackPlayer.prototype._updateCurrentTime = function(currentTime) {
 	if (typeof this._onTimeChange === "function") {
 		this._onTimeChange(this._currentTime);
 	}	
-}
+};
+
+TrackPlayer.prototype.getStartTime = function() {
+	
+	var startTime;
+	
+	if (this._points && this._points.length > 0) {
+		startTime = this._points[0].timestamp;
+	}
+	
+	return startTime;
+};
+
+TrackPlayer.prototype.getEndTime = function() {
+	
+	var endTime;
+	
+	if (this._points && this._points.length > 0) {		
+		endTime = this._points[this._points.length - 1].timestamp;
+	}
+	
+	return endTime;
+};
+
 
 
