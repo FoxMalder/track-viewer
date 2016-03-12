@@ -17,6 +17,8 @@
 	<script src="leaflet.markercluster.js"></script>
     <script src="http://contentsrv.ibecom.ru/tracker/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/locale/ru.js"></script>  
     <script src="TrackMap.js"></script> 
     <script src="TrackPlayer.js"></script>
     
@@ -26,12 +28,20 @@
 		
 		// should be before loading ibgeomap.js because ibgeomap.js checks this flag immediatly
 		window.appSideInit = true;
+		
+		moment.locale('ru');
 				
 		var socket = io.connect('http://contentsrv.ibecom.ru', {
 				path : "/tracker/socket.io"
 			}),
 			map = new TrackMap(),
-			trackPlayer = new TrackPlayer(map);
+			trackPlayer = new TrackPlayer({
+				map : map,
+				onTimeChange : function(time) {
+					var formattedDate = moment(time).format('DD.MM.YYYY HH:mm:ss');
+					$("#time_ind").text("Время: " + formattedDate);
+				}
+			});
 				
 		$(function() {
 			
@@ -39,6 +49,11 @@
 		        if (track.length === 0) {
 		            return;
 		        }
+		        
+		        $.each(track, function(i, point) {
+		        	point.timestamp = parseInt(point.timestamp, 10);
+		        });
+		        
 		        trackPlayer.load(track);
 		        trackPlayer.play();
 		    });
@@ -123,6 +138,7 @@
 			<button id="play_button">Воспроизведение</button>
 			<p id="speed_ind"></p>
 			<div id="speed_slider"></div>
+			<p id="time_ind"></p>
 		</div>
 		<div id="map" class="right_panel"></div>
 	</div>

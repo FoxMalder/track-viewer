@@ -1,18 +1,22 @@
 describe("TrackPlayer", function() {
 	
-	var timerCallback,
+	var onTimeChangeSpy,
 		trackPlayer,
 		map;
 	
 	
 	beforeEach(function() {
 
-		timerCallback = jasmine.createSpy("timerCallback");
 		jasmine.clock().install();
+		
+		onTimeChangeSpy = jasmine.createSpy("onTimeChangedSpy");
 
 		map = new TrackMap();
 
-		trackPlayer = new TrackPlayer(map);
+		trackPlayer = new TrackPlayer({
+			map : map,
+			onTimeChange : onTimeChangeSpy
+		});
 		
 		spyOn(map, 'displayPoint');
 
@@ -156,6 +160,33 @@ describe("TrackPlayer", function() {
 		
 		jasmine.clock().tick(1);
 		expect(map.displayPoint).toHaveBeenCalledTimes(3);
+		
+	});
+	
+	it("should call 'onTimeChange' handler each time when point is displayed", function() {
+		
+		var points = [ {
+			x : 10,
+			y : 20,
+			level : "0",
+			timestamp : 100
+		}, {
+			x : 30,
+			y : 40,
+			level : "1",
+			timestamp : 300
+		}];
+		
+		trackPlayer.load(points);
+		trackPlayer.play();
+		
+		expect(onTimeChangeSpy).toHaveBeenCalledTimes(1);
+		expect(onTimeChangeSpy).toHaveBeenCalledWith(100);
+		
+		
+		jasmine.clock().tick(200);
+		expect(onTimeChangeSpy).toHaveBeenCalledTimes(2);
+		expect(onTimeChangeSpy).toHaveBeenCalledWith(300);
 		
 	});
 	
