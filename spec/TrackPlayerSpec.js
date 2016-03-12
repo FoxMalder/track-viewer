@@ -126,7 +126,7 @@ describe("TrackPlayer", function() {
 		expect(map.displayPoint).toHaveBeenCalledTimes(2);
 	});
 	
-	it("should react to change speed by adjust time of displaying next point", function() {
+	it("should react to change speed by adjust time of displaying current point", function() {
 
 		var points = [ {
 			x : 10,
@@ -138,28 +138,20 @@ describe("TrackPlayer", function() {
 			y : 40,
 			level : "1",
 			timestamp : 200
-		}, {
-			x : 50,
-			y : 60,
-			level : "2",
-			timestamp : 300
 		}];
 				
 		trackPlayer.load(points);
 		trackPlayer.play();
 		
-		trackPlayer.setSpeed(10.0);
+		jasmine.clock().tick(50); // 50 ms left
+		
+		trackPlayer.setSpeed(2.0); // 50/2 = 25 ms left
 			
-		// current point display time already scheduled - therefore change of speed has no effect for it
-		jasmine.clock().tick(100);
-		expect(map.displayPoint).toHaveBeenCalledTimes(2);
-		
-		
-		jasmine.clock().tick(9);
-		expect(map.displayPoint).toHaveBeenCalledTimes(2);
+		jasmine.clock().tick(24);
+		expect(map.displayPoint).toHaveBeenCalledTimes(1);
 		
 		jasmine.clock().tick(1);
-		expect(map.displayPoint).toHaveBeenCalledTimes(3);
+		expect(map.displayPoint).toHaveBeenCalledTimes(1);
 		
 	});
 	
