@@ -71,8 +71,25 @@
 		    	
 		    });
 			
+			
+			function setSpeedIndValue(value) {
+				$("#speed_ind").text("Скорость: " + value + "x");
+			}
+		    
+			$("#speed_slider").slider({
+					value : 1,
+					min : 1,
+					max : 20,
+					slide : function(event, ui) {
+						var speed = ui.value;
+						
+						setSpeedIndValue(speed);
+						trackPlayer.setSpeed(speed);
+					}
+				});
+			setSpeedIndValue($("#speed_slider").slider("value"));
+
 		});
-		
 	</script>
 	<script src="ibgeomap.js"></script>
 	
@@ -86,6 +103,9 @@
 			width: 400px;
 			height: 100%;
 			float: left;
+			margin: 10px;
+			font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
+			font-size: 62.5%;
 		}
 		
 		.rigth_panel {
@@ -101,6 +121,8 @@
 	<div class="main_container">
 		<div class="left_panel">
 			<button id="play_button">Воспроизведение</button>
+			<p id="speed_ind"></p>
+			<div id="speed_slider"></div>
 		</div>
 		<div id="map" class="right_panel"></div>
 	</div>

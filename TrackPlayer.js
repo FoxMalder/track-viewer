@@ -1,6 +1,7 @@
 function TrackPlayer(map) {
 	this._map = map;
 	this._points = null;
+	this._speed = 1.0;
 }
 
 TrackPlayer.prototype.load = function(points) {
@@ -27,7 +28,7 @@ TrackPlayer.prototype._setupDisplayNextPoint = function() {
 	
 	var currentPoint = this._points[this._pointIndex],
 		nextPoint = this._points[this._pointIndex + 1],
-		delay = nextPoint.timestamp - currentPoint.timestamp;
+		delay = (nextPoint.timestamp - currentPoint.timestamp) / this._speed,
 		self = this;
 	
 	setTimeout(function() {
@@ -39,3 +40,9 @@ TrackPlayer.prototype._setupDisplayNextPoint = function() {
 	}, delay);
 	
 };
+
+TrackPlayer.prototype.setSpeed = function(speed) {
+	this._speed = speed;
+};
+
+
