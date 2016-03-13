@@ -6,9 +6,7 @@ function TrackPlayer(options) {
 	this._track = null;
 	this._speed = 1.0;
 	this._currentTime = null;
-	this._displayPointStart = null;
-	this._displayNextPointTask = null;
-	this._updateCurrentTimeTask = null;
+	this._isPlaying = false;
 }
 
 TrackPlayer.UPDATE_CURRENT_TIME_INTERVAL = 100; // ms
@@ -26,6 +24,12 @@ TrackPlayer.prototype.load = function(track) {
 
 TrackPlayer.prototype.play = function() {
 	
+	if (!this._track || this._isPlaying) {
+		return;
+	}
+	
+	this._isPlaying = true;
+	
 	var endTime = this._track.getEndTime(),
 		self = this;
 	
@@ -41,7 +45,7 @@ TrackPlayer.prototype.play = function() {
 		
 		if (currentTime >= endTime) {
 			currentTime = endTime;
-			self._stop();
+			self.stop();
 		}
 				
 		self.setCurrentTime(currentTime);
@@ -91,11 +95,15 @@ TrackPlayer.prototype._displayCurrentPoint = function() {
 };
 
 
-TrackPlayer.prototype._stop = function() {
-	if (this._playTask) {
-		clearInterval(this._playTask);
-		this._playTask = null;
+TrackPlayer.prototype.stop = function() {	
+	
+	if (!this._isPlaying) {
+		return;
 	}
+	
+	this._isPlaying = false;
+	clearInterval(this._playTask);
+	this._playTask = null;
 };
 
 

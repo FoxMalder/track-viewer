@@ -91,6 +91,15 @@
 		    	trackPlayer.play();
 		    });
 			
+			$('#pause_button').button({
+		        icons: {
+		          primary: "ui-icon-pause"
+		        },
+		        text: false
+		    }).click(function() {
+		    	trackPlayer.stop();
+		    });
+			
 			socket.emit('load-track', {
 	            appId: 3,
 	            startTimeStamp: Date.parse("29 Dec 2015 17:32 UTC+3"),
@@ -168,6 +177,7 @@
 		
 			<div>
 				<button id="play_button">Воспроизведение</button>
+				<button id="pause_button">Пауза</button>
 			</div>
 			
 			<p id="speed_ind"></p>
