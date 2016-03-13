@@ -14,9 +14,11 @@ function TrackPlayer(options) {
 TrackPlayer.UPDATE_CURRENT_TIME_INTERVAL = 100; // ms
 
 TrackPlayer.prototype.load = function(track) {
-	this._track = track;
-	this._points = track.points;
 	
+	this._track = track;
+	
+	this._reset();
+		
 	if (typeof this._onLoad === "function") {
 		this._onLoad(track);
 	}
@@ -24,96 +26,79 @@ TrackPlayer.prototype.load = function(track) {
 
 TrackPlayer.prototype.play = function() {
 	
-	var self = this;
+	var endTime = this._track.getEndTime(),
+		self = this;
 	
-	if (!this._points || this._points.length === 0) {
-		return;
+	if (this._currentTime === endTime) {
+		this._reset();
 	}
 	
-	this._pointIndex = 0;	
-	this._processPoint(0);
-	
-	this._setupDisplayNextPoint();
-	
-	this._updateCurrentTimeTask = setInterval(function(){	
+	this._displayCurrentPoint();
+		
+	this._playTask = setInterval(function(){	
+		
+		var currentTime = self._currentTime + TrackPlayer.UPDATE_CURRENT_TIME_INTERVAL * self._speed;
+		
+		if (currentTime >= endTime) {
+			currentTime = endTime;
+			self._stop();
+		}
 				
-		var currentTime = self._points[self._pointIndex].timestamp + self._getDisplayTime();
-		self._updateCurrentTime(currentTime);
-			
+		self.setCurrentTime(currentTime);
+		
 	}, TrackPlayer.UPDATE_CURRENT_TIME_INTERVAL);
 };
 
-TrackPlayer.prototype.setSpeed = function(speed) {
-	
-	var displayTime = this._getDisplayTime();
-	this._speed = speed;
-	this._resetDisplayNextPointTask(displayTime);		
-};
 
-TrackPlayer.prototype.setCurrentTime = function(time) {
-	
-	this._pointIndex = this._track.findPointIndex(time);
-	
-	var displayTime = this._points[this._pointIndex].timestamp - time;
-	
-	this._processPoint(displayTime);
-	this._resetDisplayNextPointTask(displayTime);
-};
-
-TrackPlayer.prototype._getDisplayTime = function() {
-	return (Date.now() - this._displayPointStart) * this._speed;
-};
-
-TrackPlayer.prototype._resetDisplayNextPointTask = function(displayTime) {
-	if (this._displayNextPointTask) {
-		
-		clearTimeout(this._displayNextPointTask);
-		this._setupDisplayNextPoint(displayTime);
-	}
-};
-
-TrackPlayer.prototype._setupDisplayNextPoint = function(displayTime) {
-	
-	displayTime = displayTime || 0;
-			
-	if (this._pointIndex === this._points.length - 1) {
-		clearInterval(this._updateCurrentTimeTask);
-		this._displayNextPointTask = null;
-		return;
-	}
-	
-	var currentPoint = this._points[this._pointIndex],
-		nextPoint = this._points[this._pointIndex + 1],
-		delay = (nextPoint.timestamp - currentPoint.timestamp - displayTime) / this._speed,
-		self = this;
-	
-	this._displayNextPointTask = setTimeout(function() {
-		
-		self._pointIndex++;
-		self._processPoint(displayTime);
-		self._setupDisplayNextPoint();
-		
-	}, delay);
-	
-};
-
-TrackPlayer.prototype._processPoint = function(displayTime) {
-	
-	var point = this._points[this._pointIndex];
-	
-	this._map.displayPoint(point);
-	this._displayPointStart = Date.now() - displayTime;
-	
-	this._updateCurrentTime(point.timestamp + displayTime);
+TrackPlayer.prototype._reset = function() {
+	this._pointIndex = 0;
+	this.setCurrentTime(this._track.getStartTime());
 };
 
 
-TrackPlayer.prototype._updateCurrentTime = function(currentTime) {
+TrackPlayer.prototype.setCurrentTime = function(currentTime) {
+	
 	this._currentTime = currentTime;
 	
+	this._advanceToTime();
+		
 	if (typeof this._onTimeChange === "function") {
 		this._onTimeChange(this._currentTime);
 	}	
 };
 
 
+TrackPlayer.prototype._advanceToTime = function() {
+	
+	if (this._currentTime == this._track.getEndTime()) {
+		this._pointIndex = this._track.getPointsCount() - 1;
+		this._displayCurrentPoint();
+		return;
+	}
+	
+	var nextPointIndex = this._track.findPointIndex(this._currentTime);
+
+	if (nextPointIndex != this._pointIndex) {
+		this._pointIndex = nextPointIndex;
+		this._displayCurrentPoint();
+	}
+};
+
+
+TrackPlayer.prototype._displayCurrentPoint = function() {	
+	var point = this._track.getPoint(this._pointIndex);
+	this._map.displayPoint(point);
+};
+
+
+TrackPlayer.prototype._stop = function() {
+	if (this._playTask) {
+		clearInterval(this._playTask);
+		this._playTask = null;
+	}
+};
+
+
+TrackPlayer.prototype.setSpeed = function(speed) {
+	this._speed = speed;
+};

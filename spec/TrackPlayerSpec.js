@@ -141,17 +141,17 @@ describe("TrackPlayer", function() {
 			x : 30,
 			y : 40,
 			level : "1",
-			timestamp : 200
+			timestamp : 600
 		}];
 				
 		trackPlayer.load(new Track(points));
 		trackPlayer.play();
 		
-		jasmine.clock().tick(50); // 50 ms left
+		jasmine.clock().tick(400); // 200 ms left
 		
-		trackPlayer.setSpeed(2.0); // 50/2 = 25 ms left
+		trackPlayer.setSpeed(2.0); // 200/2 = 100 ms left
 			
-		jasmine.clock().tick(24);
+		jasmine.clock().tick(99);
 		expect(map.displayPoint).toHaveBeenCalledTimes(1);
 		
 		jasmine.clock().tick(1);
@@ -191,7 +191,12 @@ describe("TrackPlayer", function() {
 	
 	it("should call 'onLoad' handler when 'load()' method is called", function() {
 		
-		trackPlayer.load([]);
+		trackPlayer.load(new Track([{
+			x : 10,
+			y : 20,
+			level : "0",
+			timestamp : 100
+		}]));
 		expect(onLoadSpy).toHaveBeenCalled();
 		
 	});	

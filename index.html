@@ -39,9 +39,7 @@
 			trackPlayer = new TrackPlayer({
 				map : map,
 				onLoad : function(track) {
-					
-					console.log(track);
-															
+																				
 					$("#time_slider").slider("option", {
 						min : track.getStartTime(),
 						max : track.getEndTime(),
@@ -90,15 +88,14 @@
 		        },
 		        text: false
 		    }).click(function() {
-		    	
-		    	socket.emit('load-track', {
-		            appId: 3,
-		            startTimeStamp: Date.parse("29 Dec 2015 17:32 UTC+3"),
-		            endTimeStamp: Date.parse("29 Dec 2015 17:37 UTC+3")
-		        });
-		    	
+		    	trackPlayer.play();
 		    });
 			
+			socket.emit('load-track', {
+	            appId: 3,
+	            startTimeStamp: Date.parse("29 Dec 2015 17:32 UTC+3"),
+	            endTimeStamp: Date.parse("29 Dec 2015 17:37 UTC+3")
+	        });
 			
 			function setSpeedIndValue(value) {
 				$("#speed_ind").text("Скорость: " + value + "x");
