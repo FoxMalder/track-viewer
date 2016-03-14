@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="leaflet.css"/>
     <link rel="stylesheet" href="custom.css"/>
     <link rel="stylesheet" href="MarkerCluster.css"/>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.1/jquery-ui-timepicker-addon.min.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta charset="utf-8">
     
@@ -16,21 +17,35 @@
 	<script src="leaflet-indoor.js"></script>
 	<script src="leaflet.markercluster.js"></script>
     <script src="http://contentsrv.ibecom.ru/tracker/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>   
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script src="datepicker-ru.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.1/jquery-ui-timepicker-addon.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.1/i18n/jquery-ui-timepicker-ru.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/locale/ru.js"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/locale/ru.js"></script>    
     <script src="TrackMap.js"></script> 
     <script src="Track.js"></script>
     <script src="TrackPlayer.js"></script>
     
     <script type="text/javascript">
-       
-		var appID = 3;
-		
+       		
 		// should be before loading ibgeomap.js because ibgeomap.js checks this flag immediatly
 		window.appSideInit = true;
 		
 		moment.locale('ru');
+		
+		var currentUtcOffset = "+03:00";
+		var currentDisplayingTime;
+		
+		function showCurrentTime() {
+			if (currentDisplayingTime) {
+				var formattedDate = moment(currentDisplayingTime)
+					.utcOffset(currentUtcOffset)
+					.format('DD.MM.YYYY HH:mm:ss');
+				
+				$("#time_ind").text("Время: " + formattedDate);
+			}
+		}
 				
 		var socket = io.connect('http://contentsrv.ibecom.ru', {
 				path : "/tracker/socket.io"
@@ -47,9 +62,8 @@
 					});
 				},
 				onTimeChange : function(time) {
-					var formattedDate = moment(time).format('DD.MM.YYYY HH:mm:ss');
-					
-					$("#time_ind").text("Время: " + formattedDate);
+					currentDisplayingTime = time;
+					showCurrentTime();
 					$("#time_slider").slider("value", time);
 				}
 			});
@@ -57,6 +71,9 @@
 		$(function() {
 			
 			socket.on('load-track', function (points) {
+				
+				//console.log(points.length);
+				
 		        if (points.length === 0) {
 		            return;
 		        }
@@ -82,6 +99,51 @@
 						loadMapCanvas(mapdata);
 					});	
 			
+			
+			var fromDateTimeInput = $('#from_date_time_input'),
+				toDateTimeInput = $('#to_date_time_input');
+			
+			$.timepicker.datetimeRange(
+					fromDateTimeInput,
+					toDateTimeInput,
+				{
+					dateFormat: 'dd.mm.yy', 
+					timeFormat: 'HH:mm'				
+				}
+			);
+			
+			fromDateTimeInput.datetimepicker('setDate', new Date(Date.parse("29 Dec 2015 17:32")));
+			toDateTimeInput.datetimepicker('setDate', new Date(Date.parse("29 Dec 2015 17:52")));
+			
+			var tzInput = $('#tz_input')
+				.change(function(){
+					var val = tzInput.val();
+					
+					if (val.match(/[+-](\d{2})\:(\d{2})/)) {
+						currentUtcOffset = val;
+						showCurrentTime();
+					} else {
+						tzInput.val(currentUtcOffset);
+					}
+				})
+				.val(currentUtcOffset);
+			
+			
+			$('#load_button').button()
+			.click(function() {
+						    	
+		    	function getDate(input) {
+		    		return input.datetimepicker('getDate').valueOf();  
+		    	}   	
+		    		 	
+		    	socket.emit('load-track', {
+		            appId: parseInt($("#app_id_input").val(), 10),
+		            startTimeStamp: getDate(fromDateTimeInput),
+		            endTimeStamp: getDate(toDateTimeInput)
+		        });
+		    });
+			
+			
 			$('#play_button').button({
 		        icons: {
 		          primary: "ui-icon-play"
@@ -99,13 +161,7 @@
 		    }).click(function() {
 		    	trackPlayer.stop();
 		    });
-			
-			socket.emit('load-track', {
-	            appId: 3,
-	            startTimeStamp: Date.parse("29 Dec 2015 17:32 UTC+3"),
-	            endTimeStamp: Date.parse("29 Dec 2015 17:37 UTC+3")
-	        });
-			
+						
 			function setSpeedIndValue(value) {
 				$("#speed_ind").text("Скорость: " + value + "x");
 			}
@@ -133,10 +189,6 @@
 				},
 				disabled : true
 			});
-			
-			
-			
-
 		});
 	</script>
 	<script src="ibgeomap.js"></script>
@@ -153,7 +205,7 @@
 			float: left;
 			margin: 15px;
 			font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
-			font-size: 62.5%;
+			font-size: 80%;
 		}
 		
 		.rigth_panel {
@@ -161,8 +213,17 @@
 			overflow: hidden;
 		}
 		
+		.ui-widget {
+			font-size: 70%;
+		}
+				
 		.ui-slider {
 			margin-bottom: 10px;
+		}
+		
+		#params_form label {
+			display: inline-block;
+			width: 120px;
 		}
 				
 	</style>
@@ -171,7 +232,17 @@
 <body>
 
 	<div class="main_container">
+			
 		<div class="left_panel">
+			<form id="params_form">
+				<label for="app_id_input">ИД приложения:</label><input id="app_id_input" value="3"><br>
+				<label for="from_date_time_input">Начало:</label><input id="from_date_time_input"><br>
+				<label for="to_date_time_input">Конец:</label><input id="to_date_time_input"><br>
+				<label for="tz_input">Часовой пояс:</label><input id="tz_input"><br>
+				<button id="load_button" type="button">Загрузить трек</button>
+			</form>
+				
+			
 			<p id="time_ind">Время: __.__.__ __:__</p>
 			<div id="time_slider"></div>
 		

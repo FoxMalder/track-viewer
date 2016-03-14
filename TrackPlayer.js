@@ -15,6 +15,7 @@ TrackPlayer.prototype.load = function(track) {
 	
 	this._track = track;
 	
+	this.stop();
 	this._reset();
 		
 	if (typeof this._onLoad === "function") {
