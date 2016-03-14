@@ -21,9 +21,18 @@ Track.prototype.findPointIndex = function(time) {
 	}
 	
 	// TODO: use binary search for optimal performance and startIndex parameter
-	return this._points.findIndex(function(point) {
-		return point.timestamp > time;
-	}) - 1;
+	var index;
+	
+	for(var i = 0; i < this._points.length; i++) {
+		var point = this._points[i];
+		
+		if (point.timestamp > time) {
+			index = i - 1;
+			break;
+		}
+	}
+	
+	return index;
 };
 
 
