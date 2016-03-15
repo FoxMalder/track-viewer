@@ -133,7 +133,14 @@
 			.click(function() {
 						    	
 		    	function getDate(input) {
-		    		return input.datetimepicker('getDate').valueOf();  
+		    		
+		    		var oldDate = moment(input.datetimepicker('getDate')),
+		    			newOffset = moment().utcOffset(currentUtcOffset).utcOffset(),
+		    			newDate = oldDate
+			    			.add(oldDate.utcOffset(), "minutes") // same value of hour and minute, but in UTC timezone
+				    		.subtract(newOffset, "minutes"); // same value of hour and minute, but in new timezone    		
+		    		
+		    		return newDate.valueOf();  
 		    	}   	
 		    		 	
 		    	socket.emit('load-track', {
